@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title></title>
+<style type="text/css">
+*{margin:0;padding:0}
+html,body{
+	-moz-user-select:none; /*火狐*/
+	-webkit-user-select:none; /*webkit浏览器*/
+	-ms-user-select:none; /*IE10*/
+	-khtml-user-select:none; /*早期浏览器*/
+	 user-select:none;
+}
+.box{margin:150px auto;width: 1200px;}
+.playerd{
+	width: 100%;
+	overflow-x: auto;
+}
+.faoverd{height: 120px;overflow: hidden;}
+.scrolld{
+	cursor: pointer;
+	width: 86400px; 
+	height: 100px;
+	background: url(img/icon_move.png);
+	}
+.timetxtd{
+	text-align: center;
+}
+</style>
+</head>
+<body>
+
+
+
+
+<div class="box">
+	<input type="text" id="movePxID" value="0">
+	<div class="timetxtd">00:00:00</div>
+	<div class="faoverd">
+		<div id="playerID" class="playerd">
+			<div class="scrolld"></div>
+		</div>
+	</div>
+</div>
+<script src="js/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+~function(window,document){
+function VedioPlayer(){
+	return this.init()
+}
+VedioPlayer.prototype = {
+	constructor:VedioPlayer,
+	init:function(){	
+		this.playerID = $('#playerID');
+		this.scroold = $('.scrolld');
+		this.divw = this.playerID.parent().width();
+		
+		this.initEvent();
+		return this
+	},
+	initEvent:function(){ //初始化事件
+		this.iconDrag();
+		this.initWeight();
+	},
+	initWeight:function(){
+		var w = this.scroold.width()+this.divw;
+		this.scroold.width(w);
+		var a = 24;
+		var html='';
+		for(i=0;i<a;i++){
+			html+='<span style="width:'+w/24+'px;display: inline-block;">0</span>';
+		}
+		this.scroold.html(html)
+	},
+	
+	iconDrag:function(){//icon拖拽 鼠标按下
+		var _this = this;
+		_this.playerID.mousedown(function(e){
+			var e = e||window.event;
+			var scleft = _this.playerID.scrollLeft()
+			var downUp = e.pageX;
+			
+			
+		 $(document).mousemove(function(e){
+			var e = e||window.event;
+			var movePage =  e.pageX;
+			var move = scleft+downUp-movePage;
+			if(move<=0){
+				move = 0;
+			}
+			if(move+_this.divw >= _this.scroold.width()){
+				move = _this.scroold.width()-_this.divw;
+			}
+			 _this.scrollFn(move)
+			 $('#movePxID').val(move);
+			});
+		})
+		_this.mouseUp()
+	},
+	mouseUp:function(){ //鼠标松开
+		$(document).mouseup(function() {
+			$(document).off('mousemove');
+		});
+	},
+	scrollFn:function(move){ //移动距离
+		this.playerID.scrollLeft(move);
+		var times = this.setTimeHMS(move);
+		$('.timetxtd').text(times)
+	},
+	setTimeHMS:function(time){ //时分秒计算
+		var secondTime = parseInt(time);// 
+		var minuteTime = 0;
+		var hourTime = 0;
+		if(secondTime >= 60) {
+			minuteTime = parseInt(secondTime / 60);
+			secondTime = parseInt(secondTime % 60);
+			if(minuteTime >= 60) {
+				hourTime = parseInt(minuteTime / 60);
+				minuteTime = parseInt(minuteTime % 60);
+			}
+		}
+		if(secondTime<10){
+			secondTime = '0'+secondTime;
+		}
+		if(minuteTime<10){
+			minuteTime = '0'+minuteTime;
+		}
+		if(hourTime<10){
+			hourTime = '0'+hourTime;
+		}
+		var result = hourTime+':'+minuteTime+':'+secondTime
+		return result;
+	},
+}
+window.vPlayer = VedioPlayer;
+}(window,document)	
+var vedio = new vPlayer();
+</script>
+</body>
+</html>
+

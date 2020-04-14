@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title></title>
+<style type="text/css">
+*{margin: 0;padding: 0;}
+.box{width: 1440px;margin: 200px auto;}
+/* 插件样式 */
+.vplugind{position: relative;height: 80px;}
+.vplugind .playericond{position: absolute;left: 0;;bottom:0;width:1px;height: 80px;background: red;z-index: 99;}
+.vplugind .playericond .icon{position: relative;left: -12px;width: 20px;height: 20px;border-radius: 12px;border: 2px solid #000;display: inline-block;cursor: pointer;background: #fff;z-index: 99;}
+.vplugind .playericond .txtd{padding-left: 10px;}
+.vplugind .playericond .icon:after{content: "";position: absolute;top:3px;left:8px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:7px solid black;}
+.vplugind .timed{background: url(img/scale.png) no-repeat center;background-color: #cecfcf;height: 30px;position: absolute;width: 100%;bottom: 0;}
+
+
+.playerbtnd{padding-top: 20px;}
+</style>
+</head>
+<body>
+<div class="box">
+<input type="hidden" id="timesValID" value="0">
+<input type="hidden" id="timeSetIntID" value="0">
+<div class="vplugind">
+	<div class="playericond">
+		<span class="icon" id="playericondID"></span>
+		<span class="txtd">00:00:00</span>
+	</div>
+	<div class="timed"></div>
+</div>
+<div class="playerbtnd">
+	<button type="button" id="playerBtnID" class="on">播放</button>
+	<input type="text" class="inpd" placeholder="请输入播放时间" id="playerDateTimeID" autocomplete="off" value="2019-12-07"/>
+</div>
+</div>
+<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+<script src="plugins/laydate/laydate.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">	
+~function(){
+function VedioPlayer(){
+	return this.init()
+}
+VedioPlayer.prototype = {
+	constructor:VedioPlayer,
+	init:function(drgIcon){	
+		this.drgIcon  = $('.playericond'); //拖拽父层
+		this.playericondID = $('#playericondID'); //拖拽按钮
+		this.vplugind = $('.vplugind'); //父级div
+		this.playerBtn = $('#playerBtnID'); //播放按钮
+		
+		this.timer = null
+		this.moveTime = 0;
+	
+		this.initEvent();
+		return this
+	},
+	initEvent:function(){ //初始化事件
+		this.iconDrag(); //绘制icon位置
+		this.clickPlayerBtn(); //点击播放按钮
+		this.initDatePlugin(); //初始化时间控件
+		
+		$('#playerDateTimeID').val(this.getYears(this.getCurDate()));//设置初始化时间
+	},
+	iconDrag:function(){//icon拖拽 鼠标按下
+		var _this = this;
+		_this.drgIcon.mousedown(function(e){
+		var left = parseFloat(_this.drgIcon.css('left').replace(/\s+|px/gi,""));
+		
+		_this.closeBtn(left)
+		 $(document).mousemove(function(e) {
+			var parLeft = _this.vplugind.offset().left;//父级div左偏移
+			var x = e.pageX-parLeft; //计算left值
+			 _this.moveTime  = 0;
+			 var times= left*60 + x;
+			 var moveLeft = left+x;
+			 console.log(times)
+			 if(times<=0){
+				 times = 0;
+			 }
+			 if(moveLeft<=0){
+				 moveLeft = 0;
+			 }
+			 if(moveLeft>=1440){
+				 moveLeft = 1440;
+			 }
+			 $('#timesValID').val(times);
+			 _this.getInputValue(times);
+			 _this.calculateTime(times);
+				_this.drgIcon.css({
+					left:moveLeft
+				})
+				_this.mouseUp();
+			});
+		})
+	},
+	mouseUp:function(){ //鼠标松开
+		$(document).mouseup(function() {
+			$(document).off('mousemove');
+		});
+	},
+	clickPlayerBtn:function(){//点击播放按钮
+		var _this = this;
+		_this.playerBtn.click(function(){
+			 _this.moveTime  = 0;
+			_this.isBtnStatues();
+		})
+	},
+	isBtnStatues:function(){ //判断按钮转态
+		if(this.playerBtn.hasClass('on')){
+			this.playerBtn.text('暂停');
+			this.playerBtn.removeClass('on');
+			this.setTimer(true,);
+		}else{
+			this.closeBtn();
+		}
+	},
+	closeBtn:function(){//初始化按钮
+		this.playerBtn.text('播放');
+		this.playerBtn.addClass('on');
+		this.setTimer(false);
+	},
+	calculateTime:function(time){//计算时间
+		var time = this.setTimeHMS(time);
+		this.drgIcon.find('.txtd').html(time);
+		
+	},
+	setTimer:function(isopen){ //定时器开关
+		window.clearInterval(this.timer);
+		var left = parseFloat(this.drgIcon.css('left').replace(/\s+|px/gi,""));
+		var _this = this;
+		if(!isopen){
+			window.clearInterval(_this.timer);
+			return
+		}
+		if(left>=1440){
+			alert('播放结束');
+			window.clearInterval(_this.timer);
+			return
+		}
+		 _this.timer = window.setInterval(function(){
+			_this.moveTime +=1;
+			$('#timeSetIntID').val(_this.moveTime);
+			_this.moveIcon(_this.moveTime,left);
+		 },1000)
+	
+	},
+	moveIcon:function(val,left){ //移动距离
+		
+		var miao = parseFloat($('#timesValID').val());
+		var intMiao = parseFloat($('#timeSetIntID').val());
+		var val = val;
+		var times = miao + intMiao;
+			this.calculateTime(times);
+			this.getInputValue(times);
+			this.initDatePlugin();
+			this.drgIcon.css({
+				left:val*this.returnOnePxTimes()+left
+			})
+	},
+	setTimeHMS:function(time){ //时分秒计算
+		var secondTime = parseInt(time);// 
+		var minuteTime = 0;
+		var hourTime = 0;
+		if(secondTime >= 60) {
+			minuteTime = parseInt(secondTime / 60);
+			secondTime = parseInt(secondTime % 60);
+			if(minuteTime >= 60) {
+				hourTime = parseInt(minuteTime / 60);
+				minuteTime = parseInt(minuteTime % 60);
+			}
+		}
+		if(secondTime<10){
+			secondTime = '0'+secondTime;
+		}
+		if(minuteTime<10){
+			minuteTime = '0'+minuteTime;
+		}
+		if(hourTime<10){
+			hourTime = '0'+hourTime;
+		}
+		var result = hourTime+':'+minuteTime+':'+secondTime
+		return result;
+	},
+	getInputValue:function(times){
+		var val = $('#playerDateTimeID').val(); 
+		var year = this.getYears(val);
+		var time = this.setTimeHMS(times);
+		$('#playerDateTimeID').val(year)
+		
+	},
+	getYears:function(times){//获取年份
+		var timearr = times.replace(" ", ":").replace(/\:/g, "-").split("-");
+		var timestr = ""+timearr[0]+"-" + timearr[1] + "-" + timearr[2]
+		return timestr;
+	},
+	returnOnePxTimes:function(){//计算1秒等于多少px
+		var pi =(1440/86400).toFixed(6);
+			return pi
+	},
+	initDatePlugin:function(){ //初始化日期控件
+		var _this = this;
+		laydate.render({elem: '#playerDateTimeID' ,type: 'date',trigger: 'click', format:'yyyy-MM-dd',theme: 'grid',max:_this.getCurDate(),btns: ['now', 'confirm'],
+			change: function(value, date, endDate){
+				$('.layui-laydate-content').dblclick(function(){
+					$('#playerDateTimeID').val(value) 
+					$('.layui-laydate').remove();	
+				});
+			  },
+			done: function(value, date, endDate){
+			}
+		  });
+	},
+	getCurDate:function(){ //获取当前时间
+			var date = new Date();
+			var seperator1 = "-";
+			var seperator2 = ":";
+			var month = date.getMonth() + 1;
+			var strDate = date.getDate();
+			if (month >= 1 && month <= 9) {
+				month = "0" + month;
+			}
+			if (strDate >= 0 && strDate <= 9) {
+				strDate = "0" + strDate;
+			}
+			var hours = date.getHours();
+			var minute = date.getMinutes();
+			var second = date.getSeconds();
+			if(hours<10){
+				hours = '0'+hours
+			}
+			if(minute<10){
+				minute = '0'+minute
+			}
+			if(second<10){
+				second = '0'+second
+			}
+			var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate+ " " + hours + seperator2 + minute + seperator2 + second;
+			return currentdate;
+	}
+}
+window.vPlayer = VedioPlayer;
+}()
+var vedio = new vPlayer();
+</script>
+</body>
+</html>

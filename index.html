@@ -1,19 +1,816 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title></title>
-<style type="text/css">
+<link rel="stylesheet" href="css/vedio.css">
+<title>视屏监控</title>
+<style>
+.ibtnd{position: absolute;top: 30px;right: 0;z-index: 999;display: none;}
+.ibtnd button{cursor: pointer;}
 </style>
 </head>
 <body>
+<div class="vwraperd">
+	<div class="vtitd">
+		智慧物业视频监控
+		<span title="返回" id="backID"><a href="playback.html" style="color: #fff;">视屏回放</a></span>	
+		</div>
+	<div class="invdivd"></div>
+	<div class="vcond">
+		<div class="vconld">
+			<div class="lcond">
+				<div class="ltitd">
+					<p class="tit">
+						通道
+						<span class="irush" title="刷新" id="rushID"></span>
+					</p>
+					<p class="inp"><input type="text" id="searchID" placeholder="输入关键字"></p>
+				</div>
+				<div class="ltpod">
+					
+				</div>
+				<div class="lbtmd">
+					<button type="button"  id="openAll">全部打开</button>
+					<button type="button"  id="opentitle" style="margin-top: 5px;">打开标题</button>
+				</div>
+			</div>
+		</div>
+		<div class="vconrd">
+			<div class="vediod">
+				<div class="voned cediochange">
+				</div>
+				<div class="vtwod on cediochange">
+				</div>
+				<div class="vthrd cediochange">
+				</div>
+				<div class="vfoud cediochange">
+				</div>
+			</div>
+			<div class="bottomd">
+				<div class="font fl">分屏：</div>
+				<div class="fulld fl" title="全屏展示" id="fullID">&nbsp;</div>
+				<div class="vbtnd fl">
+					<span class="icon1" status="1" title="一格展示">&nbsp;</span>
+					<span class="icon2 von" status="4" title="四格展示">&nbsp;</span>
+					<span class="icon3" status="9" title="九格展示">&nbsp;</span>
+					<span class="icon4" status="16" title="十六格展示">&nbsp;</span>
+				</div>
+				<div class="fr paged">
+					<span id="prevID">上一页</span>
+					<span id="nextID">下一页</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--./titd-->
+</div>
+<input type="hidden" id="defaultHeight" value="">
+<!--./vediowraper-->
 
-11
+<div class="promptd"></div>
 
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="js/iframeClick.js"></script>
+<script type="text/javascript">
+onchangeWH();
+$(window).resize(function(){
+	if(!checkFull()){
+		$('.vtitd').show();
+		$('.vconld').show();
+		$('.bottomd').show();
+		$('.vconrd').css('left',209);
+		$('#defaultHeight').val(6);
+		onchangeWH();
+	}else{
+		clickFull();
+	}
+});
+//============页面点击事件========================================
+//监听输入框变化显示隐藏当前元素
+initDate()
+function initDate(){
+	var data = `<ul>
+						
+						<li class="ellip" vedio-num="4" ahref="https://www.baidu.com/ title="视屏4" pyq="shipingd" py="spd">视屏4</li>
+						<li class="ellip" vedio-num="5" ahref="https://www.baidu.com/" title="视屏5" pyq="shipinge" py="spe">视屏5</li>
+						<li class="ellip" vedio-num="6" ahref="https://www.baidu.com/" title="视屏6" pyq="shipingf" py="spf">视屏6</li>
+						<li class="ellip" vedio-num="7" ahref="https://www.baidu.com/" title="视屏7" pyq="shipingg" py="spg">视屏7</li>
+						<li class="ellip" vedio-num="8" ahref="https://www.baidu.com/" title="视屏8" pyq="shipingh" py="sp">视屏8</li>
+						<li class="ellip" vedio-num="9" ahref="https://www.baidu.com/" title="视屏9" pyq="shipingi" py="sph">视屏9</li>
+						<li class="ellip" vedio-num="10" ahref="https://www.baidu.com/" title="视屏10" pyq="shipingj" py="spi">视屏10</li>
+						<li class="ellip" vedio-num="11" ahref="https://www.baidu.com/" title="视屏11" pyq="shipingk" py="spg">视屏11</li>
+						<li class="ellip" vedio-num="12" ahref="https://www.baidu.com/" title="视屏12" pyq="shipingl" py="spq">视屏12</li>
+						<li class="ellip" vedio-num="13" ahref="https://www.baidu.com/" title="视屏13" pyq="shipingm" py="spl">视屏13</li>
+						<li class="ellip" vedio-num="14" ahref="https://www.baidu.com/" title="视屏14" pyq="shipingn" py="spm">视屏14</li> 
+						<li class="ellip" vedio-num="15" ahref="https://www.baidu.com/" title="视屏15" pyq="shipingo" py="spn">视屏15</li>
+						<li class="ellip" vedio-num="16" ahref="https://www.baidu.com/" title="视屏16" pyq="shipingp" py="spp">视屏16</li>
+					</ul>`;
+					$('.ltpod').html(data);
+}
+
+$('#searchID').bind('input propertychange', function(){
+	var val = $.trim($(this).val());
+	$('.ltpod ul li').hide();
+	$('.ltpod ul li').each(function(index,cur){
+		if($(cur).text().indexOf(val)!= -1 || $(cur).attr('pyq').indexOf(val)!= -1 || $(cur).attr('py').indexOf(val)!= -1){
+			$(cur).show()
+		}
+	})
+})
+//点击全屏
+$('#fullID').click(function(){
+	clickFull();
+	requestFullScreen();	
+})
+//初始化tab切换
+$('.vbtnd span').on('click',function(){
+	$('.framd').removeClass('on');
+	$(".vbtnd span").eq($(this).index()).addClass("von").siblings().removeClass('von');
+	$(".vediod .cediochange").hide().eq($(this).index()).show();
+	$('#defaultHeight').val(6);
+	cutDateFn(statuesFn());
+
+})	
+
+//初始化右侧点击事件	
+initLeftList()
+//点击左侧列表
+function initLeftList(){
+	$('.ltpod ul li').on('click',function(){
+		var lis = $('.ltpod ul li').length;
+		$(this).addClass('open')
+		var statues = statuesFn();
+		var curiframe = getCurIframeParent(statues);
+		 currentUrl($(this),curiframe,lis);
+	})
+}
+//点击全部打开
+$('#openAll').click(function(){
+	$('#defaultHeight').val(6)
+	var statues =  statuesFn()
+	var curIframe = getCurIframeParent(statues);
+	var iframeH = $(curIframe[0]).parent().parent().height();
+	$('.framd').removeClass('on')
+	$(curIframe[0].parentNode).addClass('on')	
+	if($(this).hasClass('open')){
+		$('.ltpod ul li').removeClass('open')
+		$(this).removeClass('open');
+		$(this).text('全部打开');
+		$('iframe').removeAttr('vedio-num')
+		$('iframe').attr('src','')
+		$('.ltpod ul li').removeClass('on');
+		$('.closeID').hide();
+		$('.iftitd').hide();
+		$('.paged').hide();
+		$('.ibtnd').hide();
+	}else{
+		$('.ltpod ul li').addClass('open');
+		cutDateFn(statues);
+		$('.paged').show();
+		$('.ibtnd').show();
+		$(this).addClass('open');
+		$(this).text('全部关闭');
+		$('#openAll').text('加载中...');
+		$('#openAll').attr('disabled','disabled');
+	}
+	$('#defaultHeight').val(2);
+	
+})
+//点击标题打开
+$('#opentitle').click(function(){
+	var openv = islisOpen();
+	var statues =  statuesFn()
+	var curIframe = getCurIframeParent(statues)
+	var iframeH = $(curIframe[0]).parent().parent().height();
+
+	if($(this).hasClass('open')){
+		$(this).removeClass('open');
+		$(this).text('打开标题');
+		$('.closeID').hide();
+		$('.iftitd').hide();
+		$(curIframe).height(iframeH-6);
+		$(curIframe).css('margin-top',0);
+	}else{
+		istitleOPen()
+		$(this).addClass('open');
+		$(this).text('隐藏标题');
+	}
+})
+//点击下一页
+$('#nextID').click(function(){
+	var openVedio = islisOpen(); //获取当前打开的视屏
+	var statues = statuesFn(); //获取当前tab转态
+	var curIframe = getCurIframeParent(statues) //当前打开的ifram
+	var attrs = parseInt($(this).attr('status'));
+	if(openVedio.length === 0 || JSON.stringify(openVedio) === '[]'){
+		createDiv('请先打开视频');
+		return;
+	}
+	if(openVedio.length <= statues){
+		createDiv('没有更多视屏了');
+		return;
+	}
+	if(openVedio.length == attrs){
+		createDiv('没有更多视屏了');
+		return;
+	}else{
+		if(isIframeNull()){
+			createDiv('没有更多视屏了');
+			return;
+		}
+	}
+	openVedio = openVedio.slice(attrs,attrs+statues);
+	var newAttrs = attrs+statues
+	$(this).attr('status',newAttrs);
+	$('#prevID').attr('status',newAttrs);
+	
+	iframeUrl(openVedio,curIframe);
+});	
+//点击上一页
+$('#prevID').click(function(){
+	var openVedio = islisOpen(); //获取当前打开的视屏
+	var statues = statuesFn(); //获取当前tab转态
+	var curIframe = getCurIframeParent(statues) //当前打开的ifram
+	var attrs = parseInt($(this).attr('status'));
+	if(openVedio.length === 0 || JSON.stringify(openVedio) === '[]'){
+		createDiv('请先打开视频');
+		return;
+	}
+	if(attrs === statues){
+		createDiv('当前已经是第一屏');
+		return;	
+	}
+	openVedio = openVedio.slice(attrs-statues-statues,attrs-statues);
+	var newAttrs = attrs-statues
+	$(this).attr('status',newAttrs);
+	$('#nextID').attr('status',newAttrs);
+	iframeUrl(openVedio,curIframe);
+});	
+function pagePub(){}
+//点击刷新
+$('#rushID').click(function(){
+	window.history.go(0);
+});
+//返回上一级
+/* $('#backID').click(function(){
+	window.history.go(-1);
+}); */
+//============页面点击事件========================================	
+	
+//全屏展开
+function clickFull(){ 
+	$('.vtitd').hide();
+	$('.vconld').hide();
+	$('.bottomd').hide();
+	$('.vconrd').css('left',9);
+	var vedioH=$(window).height()-18;
+	$('.voned  .framd ').height(vedioH-6);
+	$('.vtwod  .framd').height((vedioH/2)-6);
+	$('.vthrd  .framd').height((vedioH/3)-6);
+	$('.vfoud  .framd').height((vedioH/4)-6);
+	initHeight(vedioH);
+}
+//是否退出全屏	
+function checkFull() { 
+	return document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen
+}
+//全屏展示
+function requestFullScreen(element){
+	var docElm = document.documentElement;
+	if (docElm.requestFullscreen) {
+		docElm.requestFullscreen();
+	} else if (docElm.mozRequestFullScreen) {
+		docElm.mozRequestFullScreen();
+	} else if (docElm.webkitRequestFullScreen) {
+		docElm.webkitRequestFullScreen();
+	} else if (docElm.msRequestFullscreen) {
+		docElm.msRequestFullscreen();
+	}
+}	
+//onchangeWH();
+function  onchangeWH(){
+	var wh=$(window).height();
+	//-设置vtitd高度
+	var th=1080-wh;
+	if(th>10){th=10;}else if(th<0){th=0;}
+	$('.vtitd').css({
+		height:50-th + 'px',
+		lineHeight:50-th +'px'
+	});
+	var ch=wh-50-9+th;
+	if(wh<=768){
+		ch = 768-50-9+th;
+	}
+	//左侧底部按钮
+	$('.ltpod').height(ch-189-2);
+	
+	//右侧高度
+	$('.vconrd').height(ch);
+	//右侧视屏区域
+	var vedioH = ch-10-35-9; //高
+	var val = $('#defaultHeight').val();
+	if(val.length == 0 || val == '' ){
+		val = 2;
+	}else{
+		val = parseInt(val);
+	} 
+	$('.voned  .framd ').height(vedioH-val);
+	$('.vtwod  .framd').height((vedioH/2)-val);
+	$('.vthrd  .framd').height((vedioH/3)-val);
+	$('.vfoud  .framd').height((vedioH/4)-val);
+	initHeight(vedioH)
+	
+}
+//初始化内容高度
+function initHeight(vedioH){
+	var vedioH = parseInt(vedioH);
+	$('.vconrd .vediod').height(vedioH);
+	//一宫格高度
+	$('.voned  .fours').height(vedioH);
+	$('.voned  iframe').height(vedioH-2-4);
+	$('.voned  .ifbgd').height(vedioH-2-4);
+	//四宫格计算 
+	$('.vtwod .fours').height(vedioH/2);
+	$('.vtwod  iframe').height((vedioH/2)-2-4);
+	$('.vtwod  .ifbgd').height((vedioH/2)-2-4);
+	//九宫格
+	$('.vthrd .fours').height(vedioH/3);
+	$('.vthrd  iframe').height((vedioH/3)-2-4);
+	$('.vthrd  .ifbgd').height((vedioH/3)-2-4);
+	//16宫格
+	$('.vfoud .fours').height(vedioH/4);
+	$('.vfoud  iframe').height((vedioH/4)-2-4);
+	$('.vfoud  .ifbgd').height((vedioH/4)-2-4);
+	isfullTitle(vedioH)
+}
+//判断标题是否为打开转态
+function isfullTitle(iframeH){
+	var curH = iframeH;
+	var statues = parseInt(statuesFn());
+	var curIframe = getCurIframeParent(statues);
+	var marginT = 0;
+	switch(statues){
+		case 1:
+			curH = iframeH;
+			break;
+		case 4:
+			curH = (iframeH/2)-6;
+			break;
+		case 9:
+			curH = (iframeH/3)-6;
+			break;
+		case 16:
+			curH = (iframeH/4)-6;
+			break;
+	}
+	$(curIframe).each(function(){
+		if($('#opentitle').hasClass('open')){
+			if($(this).attr('src') != ''){
+				$(this).css({
+					'height':curH-22,
+					'margin-top':22
+				})
+			}else{
+				$(this).css({
+					'height':curH,
+					'margin-top':0
+				})
+			}
+		}
+	})
+}
+//默认执行4格
+cutDateFn(4)
+//切换宫格
+function cutDateFn(status){
+	$('#nextID').attr('status',status);
+	$('#prevID').attr('status',status);
+	curClearIframe(status);
+	var status = parseInt(status)
+	var urls = islisOpen();
+	var curIframe = getCurIframeParent(status)
+	switch(status){
+		case 1:
+			urls = urls.slice(0,1);
+			break;
+		case 4:
+			urls = urls.slice(0,4);
+			break;
+		case 9:
+			urls = urls.slice(0,9);
+			break;
+		case 16:
+			urls = urls.slice(0,16);
+			break;
+	}
+	iframeUrl(urls,curIframe);
+	$(curIframe[0].parentNode).addClass('on');
+	 $('.ltpod').animate({scrollTop: 0},0);
+}
+//删除iframe 
+
+//给ifrome赋值
+function iframeUrl(urls,curIframe){
+	var ary = [];
+	if(urls.length === 0){return}
+	$('.ltpod ul li').removeClass('on');
+	$('.framd').removeClass('on');
+	$(curIframe[0].parentNode).addClass('on')
+	$(curIframe).each(function(index,item){
+		$(item).attr('src','');
+		$(item).attr('vedio-num','');
+		
+		$(item).attr('src',$(urls[index]).attr('ahref'));
+		$(item).attr('vedio-num',$(urls[index]).attr('vedio-num'));
+		$(item).load(function(){
+			ary.push($(item));
+			isOnLoad(ary)
+		})
+		if($(item).attr('src')!=''){
+			$(item).prev().children().find('.cname').text($(urls[index]).text());
+		}else{
+			$(item).prev().children().find('.cname').text('');
+		}
+		$(urls[index]).addClass('on');
+	})
+	isTitleCurrent();
+	/* $('#openAll').text('全部关闭');
+	$('#openAll').removeAttr('disabled'); */
+}
+function isOnLoad(ary){
+	var statues = statuesFn();
+	if($('#openAll').hasClass('open')){
+		$('#openAll').text('加载中...');
+		$('#openAll').attr('disabled','disabled');
+		if(ary.length == statues){
+			$('#openAll').text('关闭全部');
+			$('#openAll').removeAttr('disabled');
+		}
+	}
+	
+}
+
+function isTitleCurrent(){
+	var statues = statuesFn();
+	var curIframe = $.makeArray(getCurIframeParent(statues));
+	var iframeH = $(curIframe[0]).parent().parent().height();
+	$(curIframe).each(function(){
+		if($('#opentitle').hasClass('open')){
+		if($(this).attr('src') == ''){
+			$(this).prev().children().children().hide();
+			$(this).prev().children().hide();
+			$(this).height(iframeH-6);
+			$(this).css('margin-top',0);
+		}else{
+			$(this).height(iframeH-26);
+			$(this).css('margin-top',22);
+			$(this).prev().children().children().show();
+			$(this).prev().children().show();
+		}
+		}
+	})
+}
+//判断iframe是否有空值,有则返回true
+function isIframeNull(){
+	var statues = statuesFn(); 
+	var curIframe = $.makeArray(getCurIframeParent(statues)); 
+	var istrue = curIframe.some(function(item,index){
+			return $(item).attr('src') == '';
+		})
+	return istrue
+}
+//删除iframe 并创建
+function curClearIframe(status){
+	var curParent = null;
+	var data = '';
+	switch(status){
+		case 1:
+			curParent = $('.voned');
+			break;
+		case 4:
+			curParent = $('.vtwod');
+			break;
+		case 9:
+			curParent = $('.vthrd');
+			break;
+		case 16:
+			curParent = $('.vfoud');
+			break;
+	}
+	$('.cediochange').html('');
+	for(let i=0;i<status;i++){
+		data+=`<div class="fours">
+						<div class="framd">
+							<div class="ifbgd">
+								<div class="iftitd">
+									<p class="cname"></p>
+									<p class="cls closeID">&nbsp;</p>
+								</div>
+							</div>
+							<iframe src="" scrolling="no" frameborder="0"></iframe>
+							<div class="ibtnd"><button type="button">按钮</button></div>
+						</div>
+					</div>`;
+	}
+	$(curParent).html(data);
+	onchangeWH();
+	//initBgClick();
+	iframeClose();
+	$('iframe').iframeTracker({
+			blurCallback: function(event) {
+				$('.framd').removeClass('on');
+				$(this._overId ).parent().addClass('on')
+			},
+			overCallback: function(element, event) {
+					this._overId = $(element)
+			},
+			outCallback: function(element, event) {
+					this._overId =null;
+			},
+			_overId: null
+		});
+}
+//给iframe添加边框
+/* function initBgClick(){
+	$('.ifbgd').on('click',function(){
+		$('.framd').removeClass('on');
+		$(this).parent().addClass('on')
+	})
+} */
+function iframeClose(){ //点击关闭图标
+$('.closeID').on('click',function(event){
+	var statues =  statuesFn()
+	var curIframe = getCurIframeParent(statues)
+	var iframeH = $(curIframe[0]).parent().parent().height();
+	event = event || window.event; 
+	$(this).parent().hide();
+	var _this = this
+	$('.ltpod ul li').each(function(){
+		if($(this).attr('vedio-num') == $(_this).parent().parent().next().attr('vedio-num')){
+			$(this).attr('class','');
+			isallOpend();
+		}
+	})
+	$('.framd').removeClass('on');
+	$(this).prev().text('');
+	$(this).parent().parent().parent().addClass('on');
+	$(this).parent().parent().next().attr('src','');
+	$(this).parent().parent().next().removeAttr('vedio-num');
+	$(this).parent().parent().next().css({
+		'margin-top':0,
+		'height':iframeH-6
+	});
+	initCheckIframe();
+	event.stopPropagation();
+})	
+}	
+//判断当前所有iframe和与之匹配的列表
+function isLists(cur,lis,iframes){
+	 $(cur).addClass('on');
+	 
+	 var ifm = zdylisFn(iframes);
+	 var ilist = zdylistFn(lis);
+	 var intersection = ilist.filter(function(v){ return ifm.indexOf(v) > -1 })//求出交集
+	 
+	  for (let i=0;i<lis.length;i++) {
+		  $(lis[i]).removeClass('on')
+		for(let j=0;j<intersection.length;j++){
+			if($(lis[i]).attr('vedio-num') == intersection[j]){
+				$(lis[i]).addClass('on')
+			}
+		}
+
+	  } 
+}
+//获取自定义属性列表[1,2,3]
+function zdylisFn(iframes){
+	var ary = [];
+	$(iframes).each(function(index){
+		ary.push($(iframes[index]).attr('vedio-num'));
+	})
+	return ary;
+	
+}
+//获取iframe自定义属性列表[1,2,3]
+function zdylistFn(lis){
+	var ary = []
+	$(lis).each(function(index){
+		ary.push($(lis[index]).attr('vedio-num'))
+	})
+	return ary;
+}
+
+
+function currentUrl(cur,curiframe,len){
+	var statues =  statuesFn()
+	var curI = getCurIframeParent(statues)
+	var iframeH = $(curI[0]).parent().parent().height();
+	var iframed = classOn(curiframe);
+	var isopend = isvedioOpen(cur,curiframe)
+	var curopenV = islisOpen();
+	if(isopend){
+		closeCurVedio(cur,curiframe);
+		$(cur).removeClass('open');
+		$('.paged').hide();
+		isallOpend();
+		return
+		}
+	isallOpend()
+	$('.framd').removeClass('on')
+	$(iframed).attr('src','');
+	$(iframed).attr('vedio-num','');
+	$(iframed).attr('src',$(cur).attr('ahref'));
+	$(iframed).attr('vedio-num',$(cur).attr('vedio-num'));
+	$(iframed).next().show();
+	if($(iframed).attr('src')!=''){
+		$(iframed).prev().children().find('.cname').text($(cur).text())
+	}
+	if($('#opentitle').hasClass('open')){
+		$(iframed).prev().children().children().show();
+		$(iframed).prev().children().show();
+		$(iframed).css({
+			'height':iframeH-26,
+			'margin-top':22
+		})
+		
+	}
+	isLists(cur,$(".ltpod ul li"),curiframe);
+	
+	if($(iframed).parent().parent().next().length == 0){
+		$(curiframe[0].parentNode).addClass('on');
+	}else{
+		$(iframed).parent().parent().next().children().addClass('on')
+	}
+}
+//判断标题是否打开
+function istitleOPen(){
+	var statues =  statuesFn()
+	var curIframe = getCurIframeParent(statues);	
+	var iframeH = $(curIframe[0]).parent().parent().height();
+	$(curIframe).each(function(index,item){
+		if($(item).attr('src') == ''){
+			$(item).prev().children().children().hide();
+			$(item).prev().children().hide();
+			$(item).height(iframeH-6);
+			$(item).css('margin-top',0);
+		}else{
+			$(item).height(iframeH-26);
+			$(item).css('margin-top',22);
+			$(item).prev().children().children().show();
+			$(item).prev().children().show();
+		}
+	})
+}
+//创建提示层并在两秒后删除
+function createDiv(txt){
+	var prompt = $('.promptd');
+		prompt.fadeIn();
+		prompt.html(txt);
+	window.setTimeout(function(){
+			prompt.fadeOut();
+	},1000)
+}
+//如果当前视屏已经打开,那么就将其关闭
+function closeCurVedio(cur,curiframe){
+	$(curiframe).each(function(){
+		if($(this).attr('vedio-num') == $(cur).attr('vedio-num')){
+			//12.13
+			$('.framd').removeClass('on');
+			$(cur).removeClass('on');
+			$(this.parentNode).addClass('on');
+			$(this).prev().children().hide()
+			$(this).removeAttr('vedio-num');
+			$(this).attr('src','');
+			$(this).next().hide();
+		}
+	})
+}
+//
+//根据当前视屏是否全部关闭来初始化选中样式
+function initCheckIframe(){
+	var ary = [];
+	var statues = statuesFn();
+	var curIframe =  getCurIframeParent(statues);
+	$(curIframe).each(function(){
+		if($(this).attr('src') != ''){
+			ary.push($(this));
+		}
+	})
+	if(ary.length == 0 || JSON.stringify(ary) === '[]'){
+		//14.15
+		$('.framd').removeClass('on');
+		$(curIframe[0].parentNode).addClass('on');
+		$('#opentitle').removeClass('open');
+		$('#opentitle').text('打开标题');
+	}
+}
+
+//判断当前的视屏是否打开
+function isvedioOpen(cur,curiframe){
+	var isopend = false;
+	$(curiframe).each(function(){
+		if($(cur).attr('vedio-num') == $(this).attr('vedio-num')){
+			isopend =  true
+		}
+	})
+	return isopend;
+}
+//返回当前statue
+function statuesFn(){
+	var status = 1;
+	$('.vbtnd span').each(function(index,item){
+		if($(item).hasClass('von')){
+			status = $(item).attr('status');
+		}
+	})
+	return parseInt(status);
+}
+//获取当前打开的视屏
+function islisOpen(){
+	var ary = [];
+	$('.ltpod ul li').each(function(){
+		if($(this).hasClass('open')){
+			ary.push($(this))
+		}
+	})
+	return ary;
+}
+
+
+//计算左侧列表全开全不开
+function isallOpend(){
+	var statues =  statuesFn()
+	var curIframe = getCurIframeParent(statues);	
+	var iframeH = $(curIframe[0]).parent().parent().height();
+	var ary = []
+	$('.ltpod ul li').each(function(){
+		if($(this).hasClass('open')){
+			ary.push($(this))
+		}
+	})
+	if(ary.length == 0){
+		$(curIframe).height(iframeH-6);
+		$(curIframe).css('margin-top',0);
+	/* 	$('#opentitle').removeClass('open');
+		$('#opentitle').text('打开标题'); */
+	}
+	if(ary.length != $('.ltpod ul li').length){
+		$('#openAll').removeClass('open');
+		$('#openAll').text('全部打开');
+		
+	}else{
+		
+		$('#openAll').text('全部关闭');
+		$('#openAll').addClass('open');
+	} 
+}
+//通过转态获取当前分格
+function getCurIframeParent(statues){
+	var statues = parseInt(statues);
+	var str = null;
+	switch(statues){
+		case 1:
+			str = $('.voned iframe');
+			break;
+		case 4:
+			str = $('.vtwod iframe');
+			break;
+		case 9:
+			str = $('.vthrd iframe');
+			break;
+		case 16:
+			str = $('.vfoud iframe');
+			break;
+	}
+	return str;
+}
+//判断是否全部打开
+function isOpend(){
+	var isopend = false;
+	if($('#openAll').hasClass('open')){
+		isopend = true;
+	}
+	return isopend;
+}
+//返回当前iframe为on的元素
+function classOn(cur){
+	var iframed;
+	$(cur).each(function(){
+		//16
+		if($(this.parentNode).hasClass('on')){
+			iframed = $(this);
+		}
+	})
+	return iframed;
+}
+$("iframe").on("load", function(event){//判断 iframe是否加载完成  这一步很重要
+　　$("iframe",this.contentDocument).click(function(){//添加点击事件
+　　　　alert("就是这样");
+　　});
+});
 
 </script>
 </body>
 </html>
-

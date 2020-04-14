@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Canvas For Timeline</title>
+	<style type="text/css">
+		*{margin: 0;padding: 0;}
+		body{
+		    -moz-user-select:none; /*火狐*/
+		    -webkit-user-select:none; /*webkit浏览器*/ 
+		    -ms-user-select:none; /*IE10*/
+		    -khtml-user-select:none; /*早期浏览器*/
+		    user-select:none;
+		}
+		.dated{width: 80px;}
+		.dated.ds{width: 25px;text-align: center;}
+		.boxcanvasd{width: 1200px;margin: 0 auto;height: 62px;}
+	</style>
+</head>
+<body>
+<div class="boxcanvasd">
+    <canvas id="timeline" width="1000" height="62" style="cursor: pointer;border:1px solid #2b2f33;background-color: #2b2f33;"  ondragstart="return false;"></canvas>
+
+    <button type="button" id="setTimeMove">开始播放</button>
+    <button type="button" id="stopTimeMove">停止播放</button>
+	<button type="button" id="addCalibration">刻度放大</button>
+	<button type="button" id="subCalibration">刻度缩小</button>
+	<button type="button" id="setTime">设置时间</button>
+	<input type="text" class="dated" id="dataYearID"  value="2019-12-10" autocomplete="off"/>
+	<input type="text" class="dated ds" id="dataHoursID" value="00" maxlength="2" autocomplete="off"/>
+	<input type="text" class="dated ds" id="dataMinID" value="00" maxlength="2" autocomplete="off"/>
+	<input type="text" class="dated ds" id="dataSecID" value="00" maxlength="2" autocomplete="off"/>
+</div>
+	<input type="text" id="setTimeID">
+    <script src="./jquery-1.10.2.js"></script>
+    <script src="./timeline-canvas.js"></script>
+	<script src="../plugins/laydate/laydate.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+		
+		laydate.render({elem: '#dataYearID' ,type: 'date',trigger: 'click', format:'yyyy-MM-dd',theme: 'grid',max:'+1970/01/02',
+			change: function(value, date, endDate){
+				$('.layui-laydate-content').dblclick(function(){
+					$('#dataYearID').val(value) 
+					$('.layui-laydate').remove();	
+				});
+			  }
+		  });
+	</script>
+</div>
+

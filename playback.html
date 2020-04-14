@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="css/vedio.css">
+<!-- <link rel="stylesheet" type="text/css" href="plugins/range/jquery.range.css"/> -->
+<link rel="stylesheet" type="text/css" href="css/jdate.css"/>
+<title>视屏回放</title>
+<style type="text/css">
+.framd{box-sizing: content-box !;}
+.vconrd .bottomd {height: 70px;}
+.demo-output{padding:30px 20px 0px 10px;line-height: 35px ;}
+.scale span:last-child{left:100% !important}
+.last-active{z-index: 99;}
+/* .playdatad{float: left;padding: 16px 10px;}
+.playdatad input{height: 28px;line-height: 28px;border-radius: 4px;border: 1px solid #ccc;text-indent: 10px;}
+.demo-output{margin-left: 195px;} */
+/* bac */
+.playbackd span{margin-left:10px}
+.playbackd button:hover{background: #033aa3}
+.playerbtnd{position:absolute;top:0;heght:70px;line-height: 70px}
+.playerbtnd:after{content:" ";clear:both;display:block;height:0;overflow:hidden;visibility:hidden;}
+.backvedio iframe{height:827px}
+/* 替换背景色 */
+.vconld .lcond .ltitd p.inp{background: rgba(0,0,0,0);}
+.vcond .vconld{background: #0f1e65;}
+.bottomd{background: #0f1e65;position: relative;} 
+.playbackd button{background: #0f1e65;position: relative;}
+.br{border-color:#0f1e65} 
+
+/*  b    canvas 相关样式 */
+.dated{width: 140px;text-align: center;}
+.dated.ds{width: 25px;text-align: center;}
+.boxcanvasd{height: 60px;position: absolute;left:210px;right:0px;top:5px}
+.playerbtnd{float:left;width:200px;line-height:20px;padding:5px 0}
+.playbackd input{height:23px;border-radius: 4px; border:1px solid #ccc}
+.playbackd button{padding:3px 6px ;border:1px solid #0747C1;border-radius: 4px;margin-bottom:10px;background:#0747C1 ;color:#0CA8E3;vertical-align: -1px}
+button.btnbig,button.btnsmall{position:absolute;top:30px;border-radius: 0px;padding:0;width:20px;height:20px;background: #ccc;border-color:#ccc;color:#333}
+button.btnbig:hover,button.btnsmall:hover{background: #666}
+button.btnbig{left:10px;}
+button.btnsmall{left:40px}
+.showinp{position:absolute;bottom:0;left: 0}
+.playertit{margin-bottom:5px;color:#0CA8E3}
+/*  e    canvas 相关样式 */
+</style>
+</head>
+<body>
+<div class="vwraperd">
+<div class="vtitd">
+	智慧物业视频监控
+	<span title="返回" id="backID"><a href="index.html" style="color: #fff;">视屏广场</a></span>
+</div>
+<div class="invdivd"></div>
+<div class="vcond">
+	<div class="vconld">
+		<div class="lcond">
+			<div class="ltitd">
+				<p class="tit">
+					通道
+					<span class="irush" title="刷新" id="rushID"></span>
+				</p>
+				<p class="inp"><input type="text" id="searchID" placeholder="输入关键字"></p>
+			</div>
+			<div class="ltpod">
+				<ul>
+					<li class="ellip" vedio-num="4" ahref="https://www.baidu.com/0" title=" 视屏4" pyq="shipingd" py="spd">视屏4</li>
+					<li class="ellip" vedio-num="5" ahref="https://www.baidu.com/" title="视屏5" pyq="shipinge" py="spe">视屏5</li>
+					<li class="ellip" vedio-num="6" ahref="https://www.baidu.com/0" title="视屏6" pyq="shipingf" py="spf">视屏6</li>
+					<li class="ellip" vedio-num="7" ahref="https://www.baidu.com/" title="视屏7" pyq="shipingg" py="spg">视屏7</li>
+					<li class="ellip" vedio-num="8" ahref="https://www.baidu.com/0" title="视屏8" pyq="shipingh" py="sp">视屏8</li>
+					<li class="ellip" vedio-num="9" ahref="https://www.baidu.com/" title="视屏9" pyq="shipingi" py="sph">视屏9</li>
+					<li class="ellip" vedio-num="10" ahref="https://www.baidu.com/0" title="视屏10" pyq="shipingj" py="spi">视屏10</li>
+					<li class="ellip" vedio-num="11" ahref="https://www.baidu.com/" title="视屏11" pyq="shipingk" py="spg">视屏11</li>
+					<li class="ellip" vedio-num="12" ahref="https://www.baidu.com/0" title="视屏12" pyq="shipingl" py="spq">视屏12</li>
+					<li class="ellip" vedio-num="13" ahref="https://www.baidu.com/" title="视屏13" pyq="shipingm" py="spl">视屏13</li>
+					<li class="ellip" vedio-num="14" ahref="https://www.baidu.com/0" title="视屏14" pyq="shipingn" py="spm">视屏14</li>
+					<li class="ellip" vedio-num="15" ahref="https://www.baidu.com/" title="视屏15" pyq="shipingo" py="spn">视屏15</li>
+					<li class="ellip" vedio-num="16" ahref="https://www.baidu.com/0" title="视屏16" pyq="shipingp" py="spp">视屏16</li>
+				</ul>
+			</div>
+		<!-- 	<div class="lbtmd">
+				<button type="button" id="openAll">全部打开</button>
+				<button type="button" id="opentitle" style="margin-top: 5px;">打开标题</button>
+			</div> -->
+		</div>
+	</div>
+	<div class="vconrd">
+		<div class="vediod">
+			<div class="voned on cediochange">
+				<div class="fours">
+					<div class="framd">
+						<div class="ifbgd">
+							<div class="iftitd">
+								<p class="cname"></p>
+								<p class="cls closeID">&nbsp;</p>
+							</div>
+						</div>
+						<iframe src="" scrolling="no" frameborder="0"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="bottomd playbackd">
+				<div class="boxcanvasd">
+					<button type="button" class="btnbig" id="addCalibration" title="刻度放大">+</button>
+					<button type="button" class="btnsmall" id="subCalibration" title="刻度缩小">-</button>
+			   	    <canvas id="timeline" width="1700" height="60" style="cursor: pointer;border:1px solid #2b2f33;background-color: #2b2f33;"  ondragstart="return false;"></canvas>
+				</div>
+				<div class="playerbtnd">
+					<button type="button" id="setTimeMove" style="display: none">开始播放</button>
+					<p class="playertit">设置播放时段</p>
+					<input type="text" class="dated" id="dataYearID"  autocomplete="off"/>
+					<button type="button" id="setTime">设置</button>
+				<!-- 	<input type="text" class="dated ds" id="dataHoursID" value="00" maxlength="2" autocomplete="off"/>
+					<input type="text" class="dated ds" id="dataMinID" value="00" maxlength="2" autocomplete="off"/>
+					<input type="text" class="dated ds" id="dataSecID" value="00" maxlength="2" autocomplete="off"/> -->
+				</div>
+			</div>
+	</div>
+</div>
+<!--./titd-->
+</div>
+<input type="hidden" id="defaultHeight" value="">
+<!--./vediowraper-->
+
+<div class="promptd"></div>
+
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="back/tim.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jdate.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+onchangeWH();
+$(window).resize(function() {onchangeWH();});
+//搜索
+$('#searchID').bind('input propertychange', function() {
+	var val = $.trim($(this).val());
+	$('.ltpod ul li').hide();
+	$('.ltpod ul li').each(function(index, cur) {
+		if ($(cur).text().indexOf(val) != -1 || $(cur).attr('pyq').indexOf(val) != -1 || $(cur).attr('py').indexOf(val) !=
+			-1) {
+			$(cur).show()
+		}
+	})
+})
+//监听日期控件变化
+//点击刷新
+$('#rushID').click(function() {
+	window.history.go(0);
+});
+//返回上一级
+/* $('#backID').click(function() {
+	window.history.go(-1);
+}); */
+initVedioClick()
+function initVedioClick(){
+	$('.ltpod ul li').on('click',function(){
+		var url  = $(this).attr('ahref');
+		if($(this).hasClass('open on')){
+			$(this).removeClass('open on')
+			iframeSrc('');
+			return;
+		}
+		$('.ltpod ul li').removeClass('open on');
+		$(this).addClass('open on');
+		iframeSrc(url);
+	})
+}
+//通用函数
+
+//赋值iframe
+function iframeSrc(url){
+	var curIframe = $('.voned iframe');
+		curIframe.attr('src',url)
+}
+//高度计算
+function onchangeWH() {
+	var wh = $(window).height();
+	//-设置vtitd高度
+	var th = 1080 - wh;
+	if (th > 10) {
+		th = 10;
+	} else if (th < 0) {
+		th = 0;
+	}
+	$('.vtitd').css({
+		height: 50 - th + 'px',
+		lineHeight: 50 - th + 'px'
+	});
+	var ch = wh - 50 - 9 + th;
+	if (wh <= 768) {
+		ch = 768 - 50 - 9 + th;
+	}
+	//左侧底部按钮
+	$('.ltpod').height(ch - 89 - 2);
+
+	//右侧高度
+	$('.vconrd').height(ch);
+	//右侧视屏区域
+	var vedioH = ch - 10 - 70 - 9; //高
+	$('.vconrd .vediod').height(vedioH);
+	$('.voned  .fours').height(vedioH);
+	$('.voned  .framd').height(vedioH-5);
+	//一宫格高度
+	$('.voned  iframe').height(vedioH - 5);
+	$('.voned  .ifbgd').height(vedioH  - 5);
+
+}
+jeDate("#dataYearID",{
+	 skinCell:"jedateblue",
+	  theme:{ bgcolor:"#40bf98",color:"#ffffff", pnColor:"#ccc"},
+	  language:{                            
+	        name   : "cn",
+	        month  : ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+	        weeks  : [ "日", "一", "二", "三", "四", "五", "六" ],
+	        times  : ["小时","分钟","秒数"],
+	        timetxt: ["选择时间","开始时间","结束时间"],
+	        backtxt: "返回日期",
+	        clear  : "清空",
+	        today  : "现在",
+	        yes    : "确定"
+	    },
+	    isClear:false,  
+});
+/* 设置时间 */
+$("#setTime").click(function(){
+	var val = $('#dataYearID').val();
+	if(window.childIframe === null){
+		createDiv('请先打开视频');
+		return ;
+	}
+	var time = new Date(val).getTime();
+	set_time_to_middle(time);
+	initIntetval(true,time);
+})
+function initIntetval(isopen,returnTime){
+	//window.clearInterval(timer);
+	var time = 0;
+	if(!isopen)return
+	if(returnTime === undefined){
+		time = new Date().getTime();
+	}else{
+		time = new Date(changeTime(returnTime)).getTime();
+	}
+	if(window.childIframe === null){
+		createDiv('请先打开视频');
+		return ;
+	}
+	
+	//window.childIframe.init(time);
+	$('#dataYearID').val(changeTime(returnTime));
+	/* timer = setInterval(function(){
+		window.stat+=1000
+		set_time_to_middle(time+window.stat);
+	},1000)  */
+}
+</script>
+</body>
+</html>
